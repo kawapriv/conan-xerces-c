@@ -1,8 +1,5 @@
 import os
-from shutil import copyfile
-
 from conans import ConanFile, tools, CMake
-from conans.util import files
 
 class XercesCConan(ConanFile):
     name = "xerces-c"
@@ -21,6 +18,10 @@ class XercesCConan(ConanFile):
         tools.get("http://ftp-stud.hs-esslingen.de/pub/Mirrors/ftp.apache.org/dist//xerces/c/3/sources/%s-%s.tar.gz"  % (self.name, self.version))
         os.rename("%s-%s" % (self.name, self.version), self.source_subfolder)
         
+        # No ICU support
+        tools.replace_in_file("sources/CMakeLists.txt",
+            'include(XercesICU)', 'set(ICU_FOUND False)')
+
     def build(self):
         cmake = CMake(self)
         cmake.configure(source_dir="%s/%s" % (self.source_folder, self.source_subfolder))
